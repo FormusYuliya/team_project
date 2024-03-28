@@ -72,7 +72,23 @@ function validateCVV() {
     return true;
 }
 
-buttonSubmit.addEventListener('click',payFine);
 function payFine(){
-
+    if (!validateFineNumberAndAmount() ||
+    !validatePassport() ||
+    !validateCreditCardNumber() ||
+    !validateCVV()) {
+    return;
 }
+
+// Якщо валідація пройшла успішно, видаляємо об'єкт з масиву DB
+let inputFineNumber = fineNumber.value;
+let index = DB.findIndex(item => item.номер === inputFineNumber);
+if (index !== -1) {
+    DB.splice(index, 1); // Видаляємо штраф з масиву DB
+    alert("Штраф оплачено успішно!");
+} else {
+    alert("Щось пішло не так. Штраф не був оплачений.");
+}
+}
+
+buttonSubmit.addEventListener('click', payFine);
