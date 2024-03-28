@@ -14,25 +14,81 @@ let buttonSubmit = document.getElementById("payFine");
 //Ця зміна містить всі дані які в нас зберігаються у файлі data
 let DB = data.finesData;
 
+function validateFineNumberAndAmount() {
+    let inputFineNumber = fineNumber.value;
+    let inputAmount = parseInt(amount.value);
 
-/**
-Вам необхідно реалізувати наступний функціонал.
-Зробити валідацію до всіх полів
-1. Номер та сума повинні бути однакові як в існуючого штрафу - якщо ні видавати
-alert "Номер не співпадає" або "Сума не співпадає"
+    let fine = DB.find(item => item.номер === inputFineNumber);
 
-2. Паспортні дані у форматі - перші дві літери укр алфавіту, та 6 цифр.
-Якщо не співпадає то видавати alert "Не вірний паспортний номер"
+    if (!fine) {
+        alert("Штраф з введеним номером не знайдено");
+        return false;
+    }
 
-3. Номер кредитної карки 16 цифр -
-якщо не співпадає то видавати alert "Не вірна кредитна картка"
+    if (fine.сума !== inputAmount) {
+        alert("Сума штрафу не співпадає");
+        return false;
+    }
 
-4. cvv 3 цифри - якщо не співпадає то видавати alert "Не вірний cvv".
-
-Якщо валідація проходить успішно, то виконати оплату,
- тобто вам потрібно видалити обєкт з DB
- */
-buttonSubmit.addEventListener('click',payFine);
-function payFine(){
-
+    return true;
 }
+
+// Функція для валідації паспортних даних
+function validatePassport() {
+    let inputPassport = passport.value;
+    let passportRegex = /^[а-яА-Я]{2}\d{6}$/;
+
+    if (!passportRegex.test(inputPassport)) {
+        alert("Не вірний паспортний номер");
+        return false;
+    }
+
+    return true;
+}
+
+// Функція для валідації номеру кредитної карти
+function validateCreditCardNumber() {
+    let inputCreditCardNumber = creditCardNumber.value;
+    let creditCardRegex = /^\d{16}$/;
+
+    if (!creditCardRegex.test(inputCreditCardNumber)) {
+        alert("Не вірна кредитна картка");
+        return false;
+    }
+
+    return true;
+}
+
+// Функція для валідації CVV
+function validateCVV() {
+    let inputCVV = cvv.value;
+    let cvvRegex = /^\d{3}$/;
+
+    if (!cvvRegex.test(inputCVV)) {
+        alert("Не вірний CVV");
+        return false;
+    }
+
+    return true;
+}
+
+function payFine(){
+    if (!validateFineNumberAndAmount() ||
+    !validatePassport() ||
+    !validateCreditCardNumber() ||
+    !validateCVV()) {
+    return;
+}
+
+// Якщо валідація пройшла успішно, видаляємо об'єкт з масиву DB
+let inputFineNumber = fineNumber.value;
+let index = DB.findIndex(item => item.номер === inputFineNumber);
+if (index !== -1) {
+    DB.splice(index, 1); // Видаляємо штраф з масиву DB
+    alert("Штраф оплачено успішно!");
+} else {
+    alert("Щось пішло не так. Штраф не був оплачений.");
+}
+}
+
+buttonSubmit.addEventListener('click', payFine);
